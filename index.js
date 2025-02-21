@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 require("dotenv").config();
 const app = express()
@@ -35,8 +35,75 @@ async function run() {
 
     const database = client.db("TaskManagerDB");
     const userCollection = database.collection("users");
+    const taskCollection = database.collection("tasks");
 
 
+
+    // tasks related apis 
+    app.post('/tasks', async(req, res) => {
+      const tasks = req.body;
+      const result = await taskCollection.insertOne(tasks);
+      res.send(result);
+    })
+    app.get('/tasks/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+    
+     
+        const result = await taskCollection.find(query).toArray();
+        
+       res.send(result)
+    });
+
+    
+    
+
+    // Update task status
+app.put('/tasks/:id', async (req, res) => {
+  const taskId = req.params.id;
+  const { status } = req.body;
+
+  const filter = { _id: new ObjectId(taskId) };
+  const updateDoc = {
+    $set: {
+      status: status,
+    },
+  };
+
+  const result = await taskCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
+
+// Delete task by id
+// Delete task
+app.delete('/tasks/:id', async (req, res) => {
+  const taskId = req.params.id;
+  try {
+    const result = await taskCollection.deleteOne({ _id: new ObjectId(taskId) });
+
+    // Check if a task was deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ message: 'Task not found' });
+    }
+
+    res.send({ message: 'Task deleted successfully' });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    res.status(500).send({ message: "An error occurred while deleting the task." });
+  }
+});
+
+
+
+
+  
+
+
+
+
+
+    // users related apis 
     app.post('/users', async(req, res) => {
       const users = req.body;
       const result = await userCollection.insertOne(users);
