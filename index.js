@@ -68,6 +68,8 @@ app.put('/tasks/:id', async (req, res) => {
     $set: {
       status: status,
     },
+
+    
   };
 
   const result = await taskCollection.updateOne(filter, updateDoc);
