@@ -59,22 +59,23 @@ async function run() {
     
 
     // Update task status
-app.put('/tasks/:id', async (req, res) => {
-  const taskId = req.params.id;
-  const { status } = req.body;
-
-  const filter = { _id: new ObjectId(taskId) };
-  const updateDoc = {
-    $set: {
-      status: status,
-    },
-
+    app.put('/tasks/:id', async (req, res) => {
+      const taskId = req.params.id;
+      const { title, description, status } = req.body;
     
-  };
-
-  const result = await taskCollection.updateOne(filter, updateDoc);
-  res.send(result);
-});
+      const filter = { _id: new ObjectId(taskId) };
+      const updateDoc = {
+        $set: {
+          ...(title && { title }),
+          ...(description && { description }),
+          ...(status && { status }),
+        },
+      };
+    
+      const result = await taskCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    
 
 
 // Delete task by id
