@@ -36,6 +36,16 @@ async function run() {
     const database = client.db("TaskManagerDB");
     const userCollection = database.collection("users");
     const taskCollection = database.collection("tasks");
+    const helpCollection = database.collection("help");
+
+
+
+    // help related apis 
+    app.post('/helps', async(req, res) => {
+      const helpInfo = req.body;
+      const result = await helpCollection.insertOne(helpInfo);
+      res.send(result);
+    })
 
 
 
